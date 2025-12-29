@@ -66,9 +66,16 @@
             button3 = new Button();
             button4 = new Button();
             dataGridView1 = new DataGridView();
-            label16 = new Label();
+            Column1 = new DataGridViewTextBoxColumn();
+            Column2 = new DataGridViewTextBoxColumn();
+            Column3 = new DataGridViewTextBoxColumn();
+            Column4 = new DataGridViewTextBoxColumn();
+            Column5 = new DataGridViewTextBoxColumn();
             button5 = new Button();
             label17 = new Label();
+            printDialog1 = new PrintDialog();
+            label16 = new Label();
+            printDialog2 = new PrintDialog();
             menuStrip1.SuspendLayout();
             panel1.SuspendLayout();
             groupBox1.SuspendLayout();
@@ -365,6 +372,7 @@
             // comboBox1
             // 
             comboBox1.FormattingEnabled = true;
+            comboBox1.Items.AddRange(new object[] { "Cash", "Online", "Card" });
             comboBox1.Location = new Point(491, 140);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(128, 33);
@@ -379,7 +387,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(717, 290);
+            button1.Location = new Point(693, 290);
             button1.Name = "button1";
             button1.Size = new Size(112, 34);
             button1.TabIndex = 10;
@@ -389,25 +397,27 @@
             // 
             // button2
             // 
-            button2.Location = new Point(859, 290);
+            button2.Location = new Point(872, 290);
             button2.Name = "button2";
             button2.Size = new Size(112, 34);
             button2.TabIndex = 11;
             button2.Text = "Update";
             button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
             // 
             // button3
             // 
-            button3.Location = new Point(717, 358);
+            button3.Location = new Point(872, 370);
             button3.Name = "button3";
             button3.Size = new Size(112, 34);
             button3.TabIndex = 12;
             button3.Text = "Remove Item";
             button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
             // 
             // button4
             // 
-            button4.Location = new Point(859, 358);
+            button4.Location = new Point(872, 330);
             button4.Name = "button4";
             button4.Size = new Size(112, 34);
             button4.TabIndex = 13;
@@ -418,28 +428,54 @@
             // dataGridView1
             // 
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { Column1, Column2, Column3, Column4, Column5 });
             dataGridView1.Location = new Point(14, 362);
             dataGridView1.Name = "dataGridView1";
             dataGridView1.RowHeadersWidth = 62;
-            dataGridView1.Size = new Size(684, 260);
+            dataGridView1.Size = new Size(809, 260);
             dataGridView1.TabIndex = 14;
             // 
-            // label16
+            // Column1
             // 
-            label16.AutoSize = true;
-            label16.Font = new Font("Segoe UI", 14F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label16.Location = new Point(717, 411);
-            label16.Name = "label16";
-            label16.Size = new Size(89, 38);
-            label16.TabIndex = 15;
-            label16.Text = "Total:";
+            Column1.HeaderText = "ID";
+            Column1.MinimumWidth = 8;
+            Column1.Name = "Column1";
+            Column1.Width = 150;
+            // 
+            // Column2
+            // 
+            Column2.HeaderText = "Name";
+            Column2.MinimumWidth = 8;
+            Column2.Name = "Column2";
+            Column2.Width = 150;
+            // 
+            // Column3
+            // 
+            Column3.HeaderText = "Qty";
+            Column3.MinimumWidth = 8;
+            Column3.Name = "Column3";
+            Column3.Width = 150;
+            // 
+            // Column4
+            // 
+            Column4.HeaderText = "Price";
+            Column4.MinimumWidth = 8;
+            Column4.Name = "Column4";
+            Column4.Width = 150;
+            // 
+            // Column5
+            // 
+            Column5.HeaderText = "Sub Total";
+            Column5.MinimumWidth = 8;
+            Column5.Name = "Column5";
+            Column5.Width = 150;
             // 
             // button5
             // 
             button5.Font = new Font("Segoe UI", 24F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            button5.Location = new Point(717, 514);
+            button5.Location = new Point(829, 533);
             button5.Name = "button5";
-            button5.Size = new Size(254, 93);
+            button5.Size = new Size(158, 74);
             button5.TabIndex = 16;
             button5.Text = "Save";
             button5.UseVisualStyleBackColor = true;
@@ -451,11 +487,30 @@
             label17.BackColor = SystemColors.ActiveCaptionText;
             label17.Font = new Font("Segoe UI", 18F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label17.ForeColor = SystemColors.Control;
-            label17.Location = new Point(813, 453);
+            label17.Location = new Point(872, 465);
             label17.Name = "label17";
             label17.Size = new Size(93, 48);
             label17.TabIndex = 17;
             label17.Text = "0.00";
+            label17.Click += label17_Click;
+            // 
+            // printDialog1
+            // 
+            printDialog1.UseEXDialog = true;
+            // 
+            // label16
+            // 
+            label16.AutoSize = true;
+            label16.Font = new Font("Segoe UI", 14F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label16.Location = new Point(829, 418);
+            label16.Name = "label16";
+            label16.Size = new Size(89, 38);
+            label16.TabIndex = 15;
+            label16.Text = "Total:";
+            // 
+            // printDialog2
+            // 
+            printDialog2.UseEXDialog = true;
             // 
             // PoS_System
             // 
@@ -538,9 +593,16 @@
         private Button button3;
         private Button button4;
         private DataGridView dataGridView1;
-        private Label label16;
         private Button button5;
         private Label label17;
         private ComboBox comboBox2;
+        private PrintDialog printDialog1;
+        private DataGridViewTextBoxColumn Column1;
+        private DataGridViewTextBoxColumn Column2;
+        private DataGridViewTextBoxColumn Column3;
+        private DataGridViewTextBoxColumn Column4;
+        private DataGridViewTextBoxColumn Column5;
+        private Label label16;
+        private PrintDialog printDialog2;
     }
 }

@@ -48,14 +48,14 @@ namespace VpProject_PoS
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            label4.Text = DateTime.Now.ToString("dd-MM-yyyy HH:mm");
+            currentInvoiceID++;
+
+            // 2. Open the new form
             PoS_System newInvoiceForm = new PoS_System();
             newInvoiceForm.Show();
-            this.Close();
 
-            // Increment the ID locally for the next "New" invoice
-            currentInvoiceID++;
-            label3.Text = currentInvoiceID.ToString();
+            // 3. Close the current one
+           // this.Close();
 
         }
 
@@ -89,15 +89,34 @@ namespace VpProject_PoS
                 }
             }
             // Label 17 displays the auto-calculated sum
-            label17.Text = grandTotal.ToString("0:00");
+            label17.Text = grandTotal.ToString("C2");
         }
 
         private void button5_Click(object sender, EventArgs e)
         {
-            // Without SQL, we display a success message and trigger the print dialog
-            string summary = $"Invoice #{label3.Text} Saved Locally!\nTotal: {label17.Text}";
-            MessageBox.Show(summary, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+            using (var db = new AppDbContext())
+            {
+                foreach (DataGridViewRow row in dataGridView1.Rows)
+                {
+                    if (!row.IsNewRow && row.Cells[0].Value != null)
+                    {
+                        var item = new InvoiceItem
+                        {
+                            ProductID = row.Cells[0].Value.ToString(),
+                            ProductName = row.Cells[1].Value.ToString(),
+                            Qty = Convert.ToInt32(row.Cells[2].Value),
+                            Price = Convert.ToDecimal(row.Cells[3].Value),
+                            SubTotal = Convert.ToDecimal(row.Cells[4].Value),
+                            InvoiceNumber = int.Parse(label3.Text)
+                        };
+                        db.Invoices.Add(item);
+                    }
+                }
+                db.SaveChanges(); // Commits everything to SQL
+            }
+
+            MessageBox.Show("Invoice saved to SQL Database successfully!");
             PrintInvoice();
         }
 
@@ -120,7 +139,7 @@ namespace VpProject_PoS
             g.DrawString($"Date: {label4.Text}", bodyFont, Brushes.Black, 50, 90);
             g.DrawString($"Invoice No: {label3.Text}", bodyFont, Brushes.Black, 50, 110);
             g.DrawString("------------------------------------------", bodyFont, Brushes.Black, 50, 140);
-            g.DrawString($"Total Amount: ${label17.Text}", headerFont, Brushes.Black, 50, 170);
+            g.DrawString($"Total Amount: {label17.Text}", headerFont, Brushes.Black, 50, 170);
             g.DrawString("Thank you for your visit!", bodyFont, Brushes.Black, 50, 210);
         }
 
@@ -141,6 +160,69 @@ namespace VpProject_PoS
         private void label4_Click(object sender, EventArgs e)
         {
             label4.Text = DateTime.Now.ToString("dd-MM-yyyy HH:mm");
+        }
+
+        private void label17_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            // Check if any row is selected
+            if (dataGridView1.SelectedRows.Count > 0)
+            {
+                foreach (DataGridViewRow row in dataGridView1.SelectedRows)
+                {
+                    // Don't try to delete the empty "new row" at the bottom
+                    if (!row.IsNewRow)
+                    {
+                        dataGridView1.Rows.Remove(row);
+                    }
+                }
+
+                // Recalculate the grand total after removing
+                UpdateGrandTotal();
+            }
+            else
+            {
+                MessageBox.Show("Please select a full row to remove.", "Selection Required");
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.SelectedRows.Count > 0)
+            {
+                DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
+
+                // 1. Get values from your inputs
+                string productId = comboBox2.Text;
+                string productName = textBox7.Text;
+                int qty = (int)numericUpDown1.Value;
+
+                if (decimal.TryParse(textBox8.Text, out decimal price))
+                {
+                    // 2. Calculate new subtotal
+                    decimal rowSubtotal = price * qty;
+
+                    // 3. Update the cells in the selected row
+                    selectedRow.Cells[0].Value = productId;
+                    selectedRow.Cells[1].Value = productName;
+                    selectedRow.Cells[2].Value = qty;
+                    selectedRow.Cells[3].Value = price;
+                    selectedRow.Cells[4].Value = rowSubtotal;
+
+                    // 4. Update the Grand Total label
+                    UpdateGrandTotal();
+
+                    MessageBox.Show("Item updated successfully!");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a row in the grid to update.");
+            }
         }
     }
 }
